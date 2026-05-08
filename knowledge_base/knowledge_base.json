@@ -1,0 +1,182 @@
+[
+  {
+    "id": "KB-001",
+    "title": "What Cloud Providers Does CloudDash Support?",
+    "category": "faq",
+    "tags": ["cloud providers", "aws", "gcp", "azure", "multi-cloud"],
+    "content": "CloudDash supports AWS, Google Cloud Platform, and Microsoft Azure. You can connect multiple cloud accounts to a single organization and view infrastructure metrics, alerts, and cost data in one place.\n\nIf you are evaluating whether a provider is supported, check two things first: whether the provider offers a native integration in the Integrations page and whether your plan includes multi-cloud monitoring. Most customers use CloudDash to aggregate cloud data across accounts, normalize alerting, and compare spend across regions and teams.\n\nRecommended setup approach:\n1. Connect one provider at a time and confirm the connection status becomes healthy.\n2. Enable the data sources you need, such as billing, metrics, or logs.\n3. Build a small test dashboard or alert before rolling out the rest of your organization.\n\nIf a provider is not showing expected data, verify permissions, region selection, and whether the source account has recently changed authentication credentials.",
+    "last_updated": "2026-04-15",
+    "applies_to": ["Starter", "Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-002",
+    "title": "How Do I Reset My API Key?",
+    "category": "faq",
+    "tags": ["api key", "authentication", "security", "rotation"],
+    "content": "To reset an API key, open Settings, go to API Keys, and revoke the existing key before generating a replacement. This keeps access secure and prevents old credentials from being reused.\n\nUse this process when a key has been exposed, is no longer used, or you want to rotate credentials for security reasons. After the new key is created, update every script, integration, CI job, or webhook consumer that used the old one.\n\nBest practice for rotation:\n1. Create the new key first so there is no downtime.\n2. Update internal applications and confirm they can authenticate successfully.\n3. Revoke the old key only after the new key is confirmed working.\n4. Check audit logs for failed authorization attempts after the rotation.\n\nIf an integration still fails after the change, verify that the token was copied completely and that the request is sending the Authorization header in the expected format.",
+    "last_updated": "2026-04-12",
+    "applies_to": ["Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-003",
+    "title": "How Do I Invite Team Members?",
+    "category": "faq",
+    "tags": ["team", "users", "invitation", "roles"],
+    "content": "You can invite team members from Team Settings or the Members page. Enter the user's email address, assign a role, and send the invitation. The user will receive an email link to join the organization.\n\nChoose roles carefully because permissions affect what the new member can see and do. For example, a viewer can inspect dashboards and reports, while an admin can manage billing, integrations, and access policies.\n\nA good invitation workflow is:\n1. Confirm the email address is correct and belongs to the intended user.\n2. Assign the least privileged role that still allows the user to complete their work.\n3. Send the invite and ask the user to accept it immediately.\n4. Verify the user appears in the team list after acceptance.\n\nIf the user did not receive the email, check spam folders, invitation status, and whether the invitation expired before it was accepted.",
+    "last_updated": "2026-04-18",
+    "applies_to": ["Starter", "Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-004",
+    "title": "Where Can I Find Product Roadmap Updates?",
+    "category": "faq",
+    "tags": ["roadmap", "feature requests", "release notes", "product updates"],
+    "content": "Roadmap updates are typically shared through in-app announcements, release notes, and account-managed review calls for larger customers. CloudDash uses these channels to communicate new features, workflow improvements, and major platform changes.\n\nIf you are looking for a specific feature request, search release notes first to see whether the feature is already shipped, in preview, or scheduled. Many support questions come from customers who expected a feature to be live when it is still in beta or behind a feature flag.\n\nHow to stay current:\n1. Review the release notes page after each monthly update.\n2. Subscribe to in-app announcements if your team relies on new product capabilities.\n3. Ask your account manager whether a requested item is in active planning.\n4. Capture the business problem, not just the feature name, when requesting new functionality.\n\nIf you need to reference a roadmap item during a support case, include the goal, current workaround, and the specific workflow that is blocked.",
+    "last_updated": "2026-04-09",
+    "applies_to": ["Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-005",
+    "title": "How Do I Add or Change a Notification Channel?",
+    "category": "faq",
+    "tags": ["notifications", "slack", "email", "sms", "alerts"],
+    "content": "Notification channels are configured from the Alerts or Integrations area, depending on the channel type. CloudDash supports common delivery options such as email, Slack, and other webhook-based destinations.\n\nIf you need to update a channel, edit the existing destination rather than creating duplicates. Duplicate channels can make alert routing confusing and may cause users to believe alerts are not firing when they are simply going to another destination.\n\nRecommended check sequence:\n1. Open the channel settings and confirm the destination is still active.\n2. Send a test notification and verify delivery in the target system.\n3. Confirm the alert policy routes to the correct team or environment.\n4. Review suppression rules so alerts are not being muted unexpectedly.\n\nIf test messages arrive but real alerts do not, inspect alert filters, severity thresholds, and silence windows.",
+    "last_updated": "2026-04-26",
+    "applies_to": ["Starter", "Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-006",
+    "title": "Alerts Are Not Firing for a New Rule",
+    "category": "troubleshooting",
+    "tags": ["alerts", "rules", "thresholds", "notifications"],
+    "content": "When a newly created alert rule is not firing, start by verifying that the rule is enabled and that the threshold is actually reachable from your current telemetry. Many alerting issues are caused by a rule being created successfully but never evaluated against matching data.\n\nTroubleshooting steps:\n1. Confirm the rule status is active and not paused, muted, or disabled.\n2. Open the rule details and inspect the last evaluation timestamp.\n3. Compare the threshold to recent metric values to make sure the condition can be triggered.\n4. Check the notification channel configuration and verify the destination is healthy.\n5. Test the rule on a known datapoint or replay recent metric history if available.\n6. Review suppression windows, maintenance windows, and duplicate-alert prevention rules.\n\nIf the rule still does not fire, reduce the time range and simplify the query so you can isolate whether the issue is with the metric source, the condition logic, or the alert destination.",
+    "last_updated": "2026-04-20",
+    "applies_to": ["Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-007",
+    "title": "Dashboard Loading Slowly",
+    "category": "troubleshooting",
+    "tags": ["dashboard", "performance", "latency", "widgets"],
+    "content": "Slow dashboards are usually caused by too many widgets, large time windows, highly granular charts, or heavy multi-cloud queries. The goal is to identify whether the slowdown is caused by the browser, the dashboard layout, or the data query itself.\n\nTroubleshooting steps:\n1. Refresh the page after clearing the browser cache for the CloudDash site.\n2. Reduce the time range from several days to a few hours and compare load time.\n3. Remove nonessential widgets and see whether the dashboard becomes faster.\n4. Check whether any panels are querying high-cardinality dimensions or very dense metrics.\n5. Open the same dashboard in a private browser window to rule out extensions or cached state.\n6. If performance improves, rebuild the layout in smaller sections and split expensive charts across multiple views.\n\nIf only one dashboard is slow, the problem is usually the query design. If every dashboard is slow, check browser performance, network latency, or service health status.",
+    "last_updated": "2026-04-21",
+    "applies_to": ["Starter", "Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-008",
+    "title": "AWS CloudWatch Integration Failing",
+    "category": "troubleshooting",
+    "tags": ["aws", "cloudwatch", "integration", "iam", "permissions"],
+    "content": "When CloudWatch integration fails, the most common causes are IAM permission issues, an incorrect account ID, an invalid external ID, or a region mismatch. The connection may look configured in CloudDash, but data will not flow until AWS permissions and account metadata are correct.\n\nTroubleshooting steps:\n1. Verify the AWS role or access key has permission to read CloudWatch metrics, logs, and alarms.\n2. Confirm the AWS account ID matches the account being connected.\n3. Check that the selected region is the one containing the resources you want to monitor.\n4. Revalidate the external ID or trust policy if role assumption is used.\n5. Disconnect and reconnect the integration after making credential changes.\n6. Look for any AWS-side error messages about denied access, invalid token use, or expired credentials.\n\nIf the integration succeeds but no data appears, confirm that the monitored services are emitting CloudWatch metrics and that the metric namespace is included in the connection scope.",
+    "last_updated": "2026-04-17",
+    "applies_to": ["Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-009",
+    "title": "Integration Data Is Delayed by Several Minutes",
+    "category": "troubleshooting",
+    "tags": ["integration", "delay", "data freshness", "sync"],
+    "content": "If integration data appears delayed, first determine whether the issue is limited to one source or affects all providers. Short delays can happen when CloudDash is waiting on the upstream cloud provider, but persistent lag usually points to credential, polling, or queue issues.\n\nTroubleshooting steps:\n1. Compare the timestamp of the last successful sync with the current time.\n2. Check whether the integration is still in a healthy state.\n3. Confirm that the source system is not rate limiting API calls.\n4. Review any recent credential rotation or permission changes.\n5. If supported, trigger a manual resync and watch the results.\n6. Verify there are no maintenance windows, ingestion backlogs, or platform incidents.\n\nIf only one account is delayed, focus on its permissions and quotas. If every source is delayed, inspect platform health, polling intervals, and account-wide ingestion capacity.",
+    "last_updated": "2026-04-27",
+    "applies_to": ["Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-010",
+    "title": "Webhook Deliveries Are Returning 4xx Errors",
+    "category": "troubleshooting",
+    "tags": ["webhooks", "4xx", "delivery", "payloads"],
+    "content": "A 4xx webhook failure means the receiving system rejected the request. In most cases the issue is not CloudDash itself, but the destination endpoint expecting a different payload, signature format, or authentication method.\n\nTroubleshooting steps:\n1. Open the delivery log and inspect the exact status code and response body.\n2. Confirm the target endpoint is reachable and accepting inbound requests.\n3. Validate that the signature or authentication token is configured correctly.\n4. Compare the payload against the documented event schema.\n5. Replay a recent delivery into a staging endpoint to isolate transformation issues.\n6. Check whether the receiver requires additional headers or content-type settings.\n\nIf the same payload works in staging but fails in production, review firewall rules, URL changes, or production-side authentication differences.",
+    "last_updated": "2026-04-13",
+    "applies_to": ["Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-011",
+    "title": "Billing Cycle and Invoice Dates",
+    "category": "billing",
+    "tags": ["billing cycle", "invoice", "renewal", "subscription"],
+    "content": "CloudDash invoices are generated on the subscription renewal date unless your contract specifies a different billing schedule. Monthly plans bill every month, while annual plans are invoiced once per year and may include proration if changes happen mid-cycle.\n\nHow to interpret invoice timing:\n1. The renewal date is the anchor date for recurring billing.\n2. Any mid-cycle usage or plan upgrade may be prorated.\n3. Failed payments can cause invoice retries or service reminders.\n4. A credit note may appear separately if a billing correction was issued.\n\nIf a customer says they were billed early, check whether the invoice was generated for a renewal, a plan upgrade, or a manual adjustment. Support teams should always verify the invoice status, billing period, and payment attempt history before concluding that a duplicate charge occurred.",
+    "last_updated": "2026-04-10",
+    "applies_to": ["Starter", "Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-012",
+    "title": "Upgrading or Downgrading a Plan",
+    "category": "billing",
+    "tags": ["plan change", "upgrade", "downgrade", "proration"],
+    "content": "Plan changes can usually be made from the Billing page. Upgrades are often applied immediately so the account can access new capabilities without waiting for the next renewal date. Downgrades commonly take effect at the next billing cycle to avoid interrupting current service.\n\nWhat to expect during a plan change:\n1. Upgrades may generate a prorated charge for the remainder of the billing period.\n2. Downgrades may remove access to features or limits tied to a higher tier.\n3. Some enterprise agreements require manual approval before plan changes can be finalized.\n4. Team owners should confirm whether the new plan changes user limits, alert volume, or retention settings.\n\nBefore changing a plan, review usage, active integrations, and data retention requirements so the account does not lose access to needed features unexpectedly.",
+    "last_updated": "2026-04-14",
+    "applies_to": ["Starter", "Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-013",
+    "title": "Accepted Payment Methods",
+    "category": "billing",
+    "tags": ["payment methods", "credit card", "invoice", "bank transfer"],
+    "content": "CloudDash accepts major credit cards, and selected Enterprise accounts may also use invoicing, bank transfer, or approved purchase order workflows. Payment methods are managed from the Billing area, where admins can add, replace, or remove payment sources.\n\nRecommended verification steps:\n1. Confirm the payment method is active and not expired.\n2. Check whether the billing address or tax details need to be updated.\n3. Verify the card or bank account is allowed for the subscription type.\n4. If a payment fails, review the gateway response and retry after correcting the issue.\n5. For invoice customers, ensure the invoicing contact is correct and able to receive billing emails.\n\nIf a payment method appears valid but still fails, the issue may be with bank fraud controls, currency restrictions, or a mismatch between the billing profile and the payment source.",
+    "last_updated": "2026-04-08",
+    "applies_to": ["Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-014",
+    "title": "Refund Policy for Annual Subscriptions",
+    "category": "billing",
+    "tags": ["refund", "annual subscription", "policy", "billing"],
+    "content": "Annual subscriptions are generally non-refundable after the trial period unless the contract, local law, or a confirmed billing error requires a refund. Duplicate charges, accidental double billing, and platform-side billing defects are the most common exceptions.\n\nHow support should handle refund requests:\n1. Confirm the account owner and verify the invoice or charge in question.\n2. Determine whether the customer is within a trial, grace period, or renewal window.\n3. Check for duplicate invoices, failed retries, or partial credits that may already have been issued.\n4. Review the contract terms for any special cancellation or refund language.\n5. Escalate only when the billing evidence supports a valid exception.\n\nIf the request is not eligible for a refund, explain the reason clearly and offer alternatives such as pausing service, downgrading, or issuing a credit where appropriate.",
+    "last_updated": "2026-04-16",
+    "applies_to": ["Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-015",
+    "title": "API Authentication Overview",
+    "category": "api_documentation",
+    "tags": ["api", "authentication", "bearer token", "security"],
+    "content": "CloudDash API requests require a Bearer token in the Authorization header. Tokens are created from the API Keys page and are scoped to the organization and permissions that created them.\n\nAuthentication checklist:\n1. Generate a token from the correct organization.\n2. Store the token securely in a secrets manager or environment variable.\n3. Send it as Authorization: Bearer <token>.\n4. Confirm the token has permission to access the endpoint being called.\n5. Rotate keys regularly and revoke stale credentials.\n\nIf API calls return authorization errors, confirm the header is not being stripped by a proxy and that the token was copied without extra spaces, line breaks, or truncation.",
+    "last_updated": "2026-04-11",
+    "applies_to": ["Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-016",
+    "title": "List Alerts Endpoint",
+    "category": "api_documentation",
+    "tags": ["api", "alerts", "endpoint", "pagination"],
+    "content": "The alerts list endpoint returns alert records for an organization and supports filters such as severity, status, source, and time range. It is useful for building dashboards, automations, and reporting workflows that need a complete view of active and historical alert activity.\n\nCommon usage pattern:\n1. Authenticate with a valid Bearer token.\n2. Request the smallest useful time range to keep responses fast.\n3. Apply filters for status or severity to reduce noise.\n4. Follow the pagination cursor until all pages are retrieved.\n5. Cache results if the consumer does not need real-time freshness.\n\nIf you get partial results, confirm the client is reading every page and that the time filter is not excluding older or delayed events.",
+    "last_updated": "2026-04-19",
+    "applies_to": ["Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-017",
+    "title": "Rate Limits and Retry Behavior",
+    "category": "api_documentation",
+    "tags": ["rate limits", "retries", "api", "429"],
+    "content": "CloudDash applies rate limits per organization and per token to protect service performance. When a client exceeds the limit, the API returns HTTP 429 with retry guidance. Clients should treat rate limiting as expected behavior and retry carefully instead of flooding the service.\n\nClient handling guidance:\n1. Read the Retry-After header when present.\n2. Retry with exponential backoff and jitter.\n3. Reduce concurrency if multiple workers are sharing the same token.\n4. Avoid retry storms by capping the maximum retry count.\n5. Monitor request volume so batch jobs do not repeatedly exceed limits.\n\nIf a client is constantly rate limited, lower the request frequency, narrow the queried data, or split large jobs into smaller batches.",
+    "last_updated": "2026-04-07",
+    "applies_to": ["Starter", "Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-018",
+    "title": "Configure Webhook Notifications",
+    "category": "api_documentation",
+    "tags": ["webhooks", "notifications", "configuration", "events"],
+    "content": "Webhook notifications allow CloudDash to send event data to external systems when alert or account events occur. You register a target URL, choose the event types you care about, and confirm that the destination can verify the signed request.\n\nConfiguration checklist:\n1. Add a publicly reachable HTTPS endpoint.\n2. Select the specific event types rather than subscribing to everything.\n3. Validate the secret or signature used to verify the payload.\n4. Send a test event and confirm the endpoint responds successfully.\n5. Review delivery logs for failures and retry behavior.\n\nIf webhooks fail in production, confirm that firewall rules, authentication, and payload validation match the environment where the endpoint is deployed.",
+    "last_updated": "2026-04-06",
+    "applies_to": ["Pro", "Enterprise"]
+  },
+  {
+    "id": "KB-019",
+    "title": "Set Up SSO for Your Organization",
+    "category": "account_access",
+    "tags": ["sso", "saml", "authentication", "identity provider"],
+    "content": "SSO setup allows your organization to authenticate through an external identity provider. Enterprise admins typically upload metadata, map required attributes, test login, and then decide whether to enforce SSO for all users.\n\nSuggested setup process:\n1. Gather identity provider metadata and required certificate information.\n2. Enter the values in Organization Settings and save the connection.\n3. Test authentication with a small set of pilot users first.\n4. Verify that attribute mapping sends the correct email, name, and role information.\n5. Only enforce SSO after successful validation and backup admin access is confirmed.\n\nIf users cannot sign in after SSO is enabled, review the identity provider logs, certificate expiration, and whether the email address matches the CloudDash account record.",
+    "last_updated": "2026-04-22",
+    "applies_to": ["Enterprise"]
+  },
+  {
+    "id": "KB-020",
+    "title": "Role-Based Access Control Configuration",
+    "category": "account_access",
+    "tags": ["rbac", "permissions", "roles", "access control"],
+    "content": "CloudDash uses role-based access control to control who can view, edit, or administer resources. Built-in roles such as Admin, Editor, Viewer, and Billing Admin make it easier to apply consistent permissions across teams while still limiting access to sensitive areas.\n\nHow to configure RBAC safely:\n1. Start with a predefined role instead of building a complex custom model immediately.\n2. Map each role to a real business task such as viewing dashboards, editing alerts, or managing billing.\n3. Test the permissions with a non-admin account before rolling out broadly.\n4. Review whether integrations, exports, and audit log access should be restricted separately.\n5. Revisit permissions after team or organizational changes.\n\nIf a user has too much or too little access, compare their role assignment, group membership, and any organization-level overrides before changing the role definition itself.",
+    "last_updated": "2026-04-24",
+    "applies_to": ["Pro", "Enterprise"]
+  }
+]

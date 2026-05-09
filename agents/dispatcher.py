@@ -5,6 +5,14 @@ def dispatcher_node(state: AgentState):
     return state
 
 
+dispatch_map = {
+    "billingAgent": "billingAgent",
+    "technicalAgent": "technicalAgent",
+    "escalationAgent": "escalationAgent",
+    "finalizer": "finalizer"
+}
+
+
 def dispatcher(state: AgentState):
     tasks = state["tasks"]
     pending_tasks = [t for t in tasks if t["status"] == "pending"]
@@ -18,5 +26,7 @@ def dispatcher(state: AgentState):
         return "technicalAgent"
     elif next_task["intent"] == "billing":
         return "billingAgent"
+    elif next_task["intent"] == "escalation":
+        return "escalationAgent"
     else:
         raise ValueError(f"Unknown intent: {next_task['intent']}")

@@ -41,7 +41,11 @@ def billingAgent(state: AgentState, config: RunnableConfig) -> AgentState:
         }
 
     current_task["status"] = "completed"
+    content = response.content
+    if isinstance(content, list):
+        content = "".join([block.get("text", "")
+                          for block in content if isinstance(block, dict)])
     return {
         "tasks": tasks,
-        "agent_outputs": state["agent_outputs"] + [AgentOutput(agent="billing", task=current_task["task"], response=response.content)]
+        "agent_outputs": state["agent_outputs"] + [AgentOutput(agent="billing", task=current_task["task"], response=content)]
     }

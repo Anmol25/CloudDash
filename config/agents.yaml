@@ -22,6 +22,11 @@ escalation_agent:
   temperature: 0
   system_prompt: prompts/escalation_agent.md
 
+human_agent:
+  model: gemini-2.5-flash
+  temperature: 0
+  system_prompt: prompts/human_agent.md
+
 finalizer_agent:
   model: gemini-2.5-flash
   temperature: 0

@@ -26,4 +26,4 @@ def call_agent(request: AgentRequest):
     agent = AgentOrchestrator(collection=collection,
                               thread_id=thread_id, checkpointer=checkpointer)
     final_state = agent.run(request.message)
-    return {"thread_id": thread_id, "final_state": final_state}
+    return {"thread_id": thread_id, "final_message": final_state["messages"][-1].content, "final_state": final_state}

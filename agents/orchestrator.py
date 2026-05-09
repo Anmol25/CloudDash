@@ -2,9 +2,11 @@ from langgraph.graph import StateGraph, START, END
 from config.schema import AgentState
 from .technical_agent import technicalAgent
 from .billing_agent import billingAgent
-from .dispatcher import dispatcher, dispatcher_node
+from .dispatcher import dispatcher, dispatcher_node, dispatch_map
 from .finalizer import finalizer
 from .triage_agent import triageAgent
+from .escalation_agent import escalationAgent
+from .human_agent import humanAgent
 from langgraph.prebuilt import ToolNode, tools_condition
 from retrieval.retriever import get_retriever_tool
 from langchain_core.messages import HumanMessage
@@ -31,6 +33,8 @@ class AgentOrchestrator:
         self.graph.add_node("technicalTools", self.technical_tools)
         self.graph.add_node("finalizer", finalizer)
         self.graph.add_node("dispatcher", dispatcher_node)
+        self.graph.add_node("escalationAgent", escalationAgent)
+        self.graph.add_node("humanAgent", humanAgent)
 
         # START
         self.graph.add_edge(START, "triageAgent")
@@ -38,12 +42,14 @@ class AgentOrchestrator:
         # TRIAGE ROUTING
         self.graph.add_conditional_edges(
             "triageAgent",
-            dispatcher
+            dispatcher,
+            dispatch_map
         )
 
         self.graph.add_conditional_edges(
             "dispatcher",
-            dispatcher
+            dispatcher,
+            dispatch_map
         )
 
         # BILLING AGENT
@@ -75,6 +81,9 @@ class AgentOrchestrator:
             "technicalTools",
             "technicalAgent"
         )
+        # ESCALATION AND HUMAN AGENT
+        self.graph.add_edge("escalationAgent", "humanAgent")
+        self.graph.add_edge("humanAgent", END)
 
         # FINALIZER
         self.graph.add_edge("finalizer", END)
@@ -84,9 +93,9 @@ class AgentOrchestrator:
 
     def run(self, msg):
         initial_state = {"messages": [HumanMessage(content=msg)], "tasks": [
-        ], "agent_outputs": []}
-        config = {"collection": self.collection, "thread_id": self.thread_id}
+        ], "agent_outputs": [], "escalation_outputs": []}
+        config = {"configurable": {
+            "collection": self.collection, "thread_id": self.thread_id}}
         final_state = self.workflow.invoke(
             initial_state, config=config)
-        print("Final State:", final_state)
         return final_state

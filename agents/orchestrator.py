@@ -1,3 +1,5 @@
+import json
+
 from langgraph.graph import StateGraph, START, END
 from config.schema import AgentState
 from .technical_agent import technicalAgent
@@ -96,6 +98,12 @@ class AgentOrchestrator:
         ], "agent_outputs": [], "escalation_outputs": []}
         config = {"configurable": {
             "collection": self.collection, "thread_id": self.thread_id}}
-        final_state = self.workflow.invoke(
-            initial_state, config=config)
-        return final_state
+        # stream thread_id
+        yield json.dumps({"type": "thread_id", "thread_id": self.thread_id}).encode('utf-8') + b'\n'
+        # stream messages
+        for chunk in self.workflow.stream(initial_state, config=config, stream_mode="messages", version="v2"):
+            if chunk["type"] == "messages":
+                msg, metadata = chunk["data"]
+                if msg.content and (metadata["langgraph_node"] == "finalizer" or metadata["langgraph_node"] == "humanAgent"):
+                    print(msg.content)
+                    yield json.dumps({"type": "message", "content": msg.content}).encode('utf-8') + b'\n'

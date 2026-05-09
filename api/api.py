@@ -5,6 +5,7 @@ from typing import Optional
 import uuid
 from langgraph.checkpoint.memory import MemorySaver
 from retrieval.chroma_collections import get_collection
+from fastapi.responses import StreamingResponse
 
 router = APIRouter()
 
@@ -25,5 +26,4 @@ def call_agent(request: AgentRequest):
         thread_id = request.thread_id
     agent = AgentOrchestrator(collection=collection,
                               thread_id=thread_id, checkpointer=checkpointer)
-    final_state = agent.run(request.message)
-    return {"thread_id": thread_id, "final_message": final_state["messages"][-1].content, "final_state": final_state}
+    return StreamingResponse(agent.run(request.message), media_type="application/x-ndjson")

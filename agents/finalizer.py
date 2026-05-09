@@ -1,7 +1,7 @@
 import yaml
 
 from config.schema import AgentState
-from langchain_core.messages import SystemMessage, AIMessage
+from langchain_core.messages import SystemMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 with open("./config/agents.yaml", "r") as f:
@@ -19,7 +19,6 @@ def finalizer(state: AgentState) -> AgentState:
     final_response = model.invoke(
         [SystemMessage(content=SYSTEM_PROMPT),
          *state["messages"],
-         *[AIMessage(content=f"Agent: {output['agent'].capitalize()}\n Agent Task: {output['task']}\n Agent Response: {output['response']}") for output in outputs]]
+         *[SystemMessage(content=f"Agent: {output['agent'].capitalize()}\n Agent Task: {output['task']}\n Agent Response: {output['response']}") for output in outputs]]
     )
-    print("Finalizer Agent Response:", final_response)
     return {"messages": [final_response]}

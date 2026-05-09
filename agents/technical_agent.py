@@ -1,18 +1,26 @@
-import json
+import yaml
 
 from langchain_google_genai import ChatGoogleGenerativeAI
-from orchestrator import AgentState
+from config.schema import AgentState
 from langchain_core.messages import SystemMessage
-from retrieval.retriever import retriever_tool
-from orchestrator import AgentResponse, AgentOutput
+from retrieval.retriever import get_retriever_tool
+from config.schema import AgentOutput
+from langchain_core.runnables import RunnableConfig
 
-with open("../config/agent_prompts.json", "r") as f:
-    prompts = json.load(f)
-    TECHNICAL_AGENT = prompts["TECHNICAL_AGENT"]
+with open("./config/agents.yaml", "r") as f:
+    agents_config = yaml.safe_load(f)
+
+technicalAgent_config = agents_config["technical_agent"]
+prompt_location = "./config/" + technicalAgent_config["system_prompt"]
+with open(prompt_location, "r") as f:
+    SYSTEM_PROMPT = f.read()
 
 
-def technicalAgent(state: AgentState) -> AgentState:
+def technicalAgent(state: AgentState, config: RunnableConfig) -> AgentState:
     tasks = state["tasks"]
+    collection = config["configurable"]["collection"]
+    retriever_tool = get_retriever_tool(collection)
+
     current_task = next(
         t for t in tasks
         if t["intent"] == "technical"
@@ -21,14 +29,20 @@ def technicalAgent(state: AgentState) -> AgentState:
 
     model = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0)
     model_with_tool = model.bind_tools([retriever_tool])
-    structured_response = model_with_tool.with_structured_output(AgentResponse)
-    TechnicalAgentResponse = structured_response.invoke(
-        [SystemMessage(content=TECHNICAL_AGENT),
-         *state["messages"]]
+
+    response = model_with_tool.invoke(
+        [SystemMessage(content=SYSTEM_PROMPT),
+         *state["messages"], SystemMessage(content=f"Your task:\n\n task: {current_task['task']}\n\nsummary: {current_task['summary']}\n\nentities: {', '.join(current_task['entities'])}")]
     )
+
+    if response.tool_calls:
+        return {
+            "messages": [response]
+        }
+
     current_task["status"] = "completed"
 
     return {
         "tasks": tasks,
-        "agent_outputs": state["agent_outputs"] + [AgentOutput(agent="technical", response=TechnicalAgentResponse["response"], metadata=TechnicalAgentResponse["metadata"])]
+        "agent_outputs": state["agent_outputs"] + [AgentOutput(agent="technical", task=current_task["task"], response=response.content)]
     }

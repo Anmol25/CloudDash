@@ -1,0 +1,28 @@
+triage_agent:
+  model: gemini-2.5-flash
+  temperature: 0
+  system_prompt: prompts/triage_agent.md
+
+technical_agent:
+  model: gemini-2.5-flash
+  temperature: 0
+  system_prompt: prompts/technical_agent.md
+  tools:
+    - kb_search
+  
+billing_agent:
+  model: gemini-2.5-flash
+  temperature: 0
+  system_prompt: prompts/billing_agent.md
+  tools:
+    - kb_search
+  
+escalation_agent:
+  model: gemini-2.5-flash
+  temperature: 0
+  system_prompt: prompts/escalation_agent.md
+
+finalizer_agent:
+  model: gemini-2.5-flash
+  temperature: 0
+  system_prompt: prompts/finalizer_agent.md

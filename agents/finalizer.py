@@ -19,6 +19,6 @@ def finalizer(state: AgentState) -> AgentState:
     final_response = model.invoke(
         [SystemMessage(content=SYSTEM_PROMPT),
          *state["messages"],
-         *[SystemMessage(content=f"Agent: {output['agent'].capitalize()}\n Agent Task: {output['task']}\n Agent Response: {output['response']}") for output in outputs]]
+         *[SystemMessage(content=f"Agent: {output['agent'].capitalize()}\n Agent Task: {output['task']}\n Task Status: {output['task_status']}\n Agent Response: {output['response']}") for output in outputs]]
     )
     return {"messages": [final_response]}

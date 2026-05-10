@@ -6,7 +6,7 @@ from typing import Any, Dict
 from config.schema import AgentState
 
 ENV_LOG_PATH = "HANDOVER_LOG_PATH"
-DEFAULT_LOG_FILENAME = "handovers.jsonl"
+DEFAULT_LOG_FILENAME = "logs/handovers.json"
 MAX_TEXT_LEN = 500
 
 

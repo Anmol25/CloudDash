@@ -3,8 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from retrieval.chroma_collections import get_collection
 from dotenv import load_dotenv
 from api.api import router as api_router
+from logger import configure_logging
 
 load_dotenv()
+configure_logging()
 
 
 def lifespan(app: FastAPI):

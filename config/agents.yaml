@@ -8,14 +8,14 @@ technical_agent:
   temperature: 0
   system_prompt: prompts/technical_agent.md
   tools:
-    - kb_search
+    - retrieval_tool
   
 billing_agent:
   model: gemini-2.5-flash
   temperature: 0
   system_prompt: prompts/billing_agent.md
   tools:
-    - kb_search
+    - retrieval_tool
   
 escalation_agent:
   model: gemini-2.5-flash
@@ -31,3 +31,42 @@ finalizer_agent:
   model: gemini-2.5-flash
   temperature: 0
   system_prompt: prompts/finalizer_agent.md
+
+orchestration:
+  entrypoint: triageAgent
+  fallback: finalizer
+  intents:
+    technical: technicalAgent
+    billing: billingAgent
+    escalation: escalationAgent
+  router_nodes:
+    - triageAgent
+  output_nodes:
+    - finalizer
+    - humanAgent
+  nodes:
+    triageAgent:
+      module: agents.triage_agent
+      handler: triageAgent
+    billingAgent:
+      module: agents.billing_agent
+      handler: billingAgent
+      tools:
+        - retrieval_tool
+    technicalAgent:
+      module: agents.technical_agent
+      handler: technicalAgent
+      tools:
+        - retrieval_tool
+    escalationAgent:
+      module: agents.escalation_agent
+      handler: escalationAgent
+      after: humanAgent
+    humanAgent:
+      module: agents.human_agent
+      handler: humanAgent
+      after: __end__
+    finalizer:
+      module: agents.finalizer
+      handler: finalizer
+      after: __end__

@@ -5,7 +5,7 @@ from langchain_core.messages import BaseMessage
 
 
 class Tasks(TypedDict):
-    intent: Literal["technical", "billing", "escalation"]
+    intent: str
     task: str
     summary: str
     status: Literal["pending", "completed", "failed"]
@@ -13,15 +13,15 @@ class Tasks(TypedDict):
 
 
 class AgentOutput(TypedDict):
-    agent: Literal["billing", "technical", "escalation"]
+    agent: str
     task: str
     task_status: Literal["completed", "failed"]
     response: str
 
 
 class EscalationAgentOutput(AgentOutput):
-    agent: Literal["escalation"]
-    intent: Literal["technical", "billing"]
+    agent: str
+    intent: str
     task: str
     context_summary: str
     urgency: Literal["low", "medium", "high"]

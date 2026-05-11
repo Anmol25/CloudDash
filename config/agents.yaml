@@ -45,8 +45,7 @@ orchestration:
     technical: technicalAgent
     billing: billingAgent
     escalation: escalationAgent
-  router_nodes:
-    - triageAgent
+  router_nodes: []
   output_nodes:
     - finalizer
     - humanAgent

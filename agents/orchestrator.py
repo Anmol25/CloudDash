@@ -51,8 +51,6 @@ class AgentOrchestrator:
     def _create_graph(self):
         nodes = self.orchestration["nodes"]
         entrypoint = self.orchestration.get("entrypoint", "triageAgent")
-        router_nodes = set(self.orchestration.get(
-            "router_nodes", [entrypoint]))
 
         self.graph.add_node("dispatcher", dispatcher_node)
 
@@ -89,12 +87,6 @@ class AgentOrchestrator:
                     },
                 )
                 self.graph.add_edge(tool_node_name, node_name)
-            elif node_name in router_nodes:
-                self.graph.add_conditional_edges(
-                    node_name,
-                    dispatcher,
-                    dispatch_map,
-                )
             else:
                 if after == "__end__":
                     self.graph.add_edge(node_name, END)

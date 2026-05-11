@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+import logging
+from fastapi import APIRouter, HTTPException
 from agents.orchestrator import AgentOrchestrator
 from pydantic import BaseModel
 from typing import Optional
@@ -20,10 +21,15 @@ class AgentRequest(BaseModel):
 
 @router.post('/agent')
 def call_agent(request: AgentRequest):
-    if not request.thread_id:
-        thread_id = str(uuid.uuid4())
-    else:
-        thread_id = request.thread_id
-    agent = AgentOrchestrator(collection=collection,
-                              thread_id=thread_id, checkpointer=checkpointer)
-    return StreamingResponse(agent.run(request.message), media_type="application/x-ndjson")
+    logger = logging.getLogger(__name__)
+    try:
+        if not request.thread_id:
+            thread_id = str(uuid.uuid4())
+        else:
+            thread_id = request.thread_id
+        agent = AgentOrchestrator(collection=collection,
+                                  thread_id=thread_id, checkpointer=checkpointer)
+        return StreamingResponse(agent.run(request.message), media_type="application/x-ndjson")
+    except Exception:
+        logger.exception("Agent API request failed")
+        raise HTTPException(status_code=500, detail="Agent request failed")

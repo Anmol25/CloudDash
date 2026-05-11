@@ -125,6 +125,7 @@ class AgentOrchestrator:
         yield json.dumps({"type": "thread_id", "thread_id": self.thread_id}).encode('utf-8') + b'\n'
         # stream messages
         for chunk in self.workflow.stream(initial_state, config=config, stream_mode=["messages", "updates"], version="v2"):
+            # log handovers
             if chunk["type"] == "updates":
                 updates = chunk["data"]
                 for node_name, state_update in updates.items():

@@ -8,6 +8,8 @@ from retrieval.retriever import get_retriever_tool
 from config.schema import AgentOutput
 from langchain_core.runnables import RunnableConfig
 
+logger = logging.getLogger(__name__)
+
 with open("./config/agents.yaml", "r") as f:
     agents_config = yaml.safe_load(f)
 
@@ -18,7 +20,11 @@ with open(prompt_location, "r") as f:
 
 
 def technicalAgent(state: AgentState, config: RunnableConfig) -> AgentState:
-    logger = logging.getLogger(__name__)
+    """
+    Technical agent responsible for handling technical tasks. It uses a language model
+    to process the task and may call tools if needed. If the agent fails, it marks the task
+    as failed and provides a fallback response for escalation.
+    """
     tasks = state["tasks"]
     collection = config["configurable"]["collection"]
     retriever_tool = get_retriever_tool(collection)

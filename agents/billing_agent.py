@@ -20,6 +20,10 @@ with open(prompt_location, "r") as f:
 
 
 def billingAgent(state: AgentState, config: RunnableConfig) -> AgentState:
+    """
+    Agent responsible for handling billing-related tasks. It processes the assigned task using a language model and may utilize tools if necessary. 
+    In case of failure, it marks the task as failed and provides a fallback response for escalation to a human operator.
+    """
     tasks = state["tasks"]
     collection = config["configurable"]["collection"]
     retriever_tool = get_retriever_tool(collection)

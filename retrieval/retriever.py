@@ -1,3 +1,4 @@
+import logging
 from langchain_core.retrievers import BaseRetriever
 from typing import List
 from langchain_core.documents import Document
@@ -12,30 +13,35 @@ class CustomChromaRetriever(BaseRetriever):
         self,
         query: str
     ) -> List[Document]:
-        results = self.collection.query(
-            query_texts=[query],
-            n_results=self.k
-        )
-
-        documents = []
-
-        for doc, metadata, doc_id in zip(
-            results["documents"][0],
-            results["metadatas"][0],
-            results["ids"][0]
-        ):
-
-            documents.append(
-                Document(
-                    page_content=doc,
-                    metadata={
-                        "id": doc_id,
-                        **metadata
-                    }
-                )
+        logger = logging.getLogger(__name__)
+        try:
+            results = self.collection.query(
+                query_texts=[query],
+                n_results=self.k
             )
 
-        return documents
+            documents = []
+
+            for doc, metadata, doc_id in zip(
+                results["documents"][0],
+                results["metadatas"][0],
+                results["ids"][0]
+            ):
+
+                documents.append(
+                    Document(
+                        page_content=doc,
+                        metadata={
+                            "id": doc_id,
+                            **metadata
+                        }
+                    )
+                )
+
+            return documents
+        except Exception:
+            logger.exception("Retriever failed for query")
+            return []
 
 
 def get_retriever_tool(collection):
@@ -49,14 +55,15 @@ def get_retriever_tool(collection):
         """
         Retrieve articles from knowledge base.
         """
+        logger = logging.getLogger(__name__)
+        try:
+            docs = retriever.invoke(query)
 
-        docs = retriever.invoke(query)
+            formatted = []
 
-        formatted = []
-
-        for doc in docs:
-            formatted.append(
-                f"""
+            for doc in docs:
+                formatted.append(
+                    f"""
 ID: {doc.metadata.get("id")}
 TITLE: {doc.metadata.get("title")}
 CATEGORY: {doc.metadata.get("category")}
@@ -66,8 +73,11 @@ TAGS: {doc.metadata.get("tags")}
 CONTENT:
 {doc.page_content}
 """
-            )
+                )
 
-        return "\n\n====================\n\n".join(formatted)
+            return "\n\n====================\n\n".join(formatted)
+        except Exception:
+            logger.exception("Knowledge base retrieval failed")
+            return "Knowledge base retrieval failed. Please try again later."
 
     return knowledge_base_retriever

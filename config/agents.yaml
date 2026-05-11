@@ -1,3 +1,9 @@
+embeddings:
+  provider: google_gemini
+  model: gemini-embedding-001
+  dimension: 768
+  task-type: RETRIEVAL_DOCUMENT
+
 triage_agent:
   model: gemini-2.5-flash
   temperature: 0

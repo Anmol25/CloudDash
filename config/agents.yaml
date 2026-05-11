@@ -1,9 +1,11 @@
+# Embedding model configuration
 embeddings:
   provider: google_gemini
   model: gemini-embedding-001
   dimension: 768
   task-type: RETRIEVAL_DOCUMENT
 
+# List of agents
 triage_agent:
   model: gemini-2.5-flash
   temperature: 0
@@ -38,6 +40,7 @@ finalizer_agent:
   temperature: 0
   system_prompt: prompts/finalizer_agent.md
 
+# Orchestration configuration
 orchestration:
   entrypoint: triageAgent
   fallback: finalizer
@@ -45,7 +48,6 @@ orchestration:
     technical: technicalAgent
     billing: billingAgent
     escalation: escalationAgent
-  router_nodes: []
   output_nodes:
     - finalizer
     - humanAgent

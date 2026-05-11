@@ -21,6 +21,11 @@ class AgentRequest(BaseModel):
 
 @router.post('/agent')
 def call_agent(request: AgentRequest):
+    """
+    Endpoint to call the agent with a message and optional thread ID.
+     - message: The input message for the agent.
+     - thread_id: Optional thread ID to maintain conversation context. If not provided, a new thread ID will be generated.
+    """
     logger = logging.getLogger(__name__)
     try:
         if not request.thread_id:

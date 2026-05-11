@@ -109,3 +109,5 @@ IMPORTANT RULES
 {
   "tasks": []
 }
+
+- If user accepts to escalate to human operator and also additionally ask for some other query, create only single escalation task including that query in summary. 

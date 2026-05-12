@@ -119,7 +119,7 @@ For Using Langsmith Observability Tool:
 Running the API
 ---------------
 ```
-uvicorn main:app --host 0.0.0.0 --port 8000
+uvicorn main:app
 ```
 
 API Usage

@@ -1,6 +1,8 @@
 CloudDash Customer Support Bot
 ==============================
 
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white) ![LangGraph](https://img.shields.io/badge/LangGraph-1f2937?logo=python&logoColor=white) ![LangChain](https://img.shields.io/badge/LangChain-1f2937?logo=langchain&logoColor=white) ![Gemini](https://img.shields.io/badge/Gemini-4285F4?logo=google&logoColor=white) ![ChromaDB](https://img.shields.io/badge/ChromaDB-111827?logo=databricks&logoColor=white)
+
 Overview
 --------
 CloudDash is a multi-agent customer support service built on FastAPI, LangGraph, and Gemini models. It triages user requests, routes them to specialized agents (billing, technical, escalation), retrieves knowledge base context from ChromaDB, and streams the final response back to the client.

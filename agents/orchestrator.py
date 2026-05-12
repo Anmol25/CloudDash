@@ -10,6 +10,7 @@ from langgraph.prebuilt import ToolNode, tools_condition
 from config.agent_tools import build_tool_registry, load_agents_config, resolve_tool_spec
 from langchain_core.messages import HumanMessage
 from langchain_core.load import dumps
+from guardrails.output_guardrails import redact_pii
 
 _agents_config = load_agents_config()
 
@@ -122,4 +123,5 @@ class AgentOrchestrator:
             if chunk["type"] == "messages":
                 msg, metadata = chunk["data"]
                 if msg.content and (metadata["langgraph_node"] in self.output_nodes):
-                    yield json.dumps({"type": "message", "content": msg.content}).encode('utf-8') + b'\n'
+                    redacted_content, _ = redact_pii(msg.content)
+                    yield json.dumps({"type": "message", "content": redacted_content}).encode('utf-8') + b'\n'

@@ -11,6 +11,7 @@ Key Features
 - Triage and routing by intent (billing, technical, escalation)
 - Knowledge base retrieval tool backed by ChromaDB
 - Streaming NDJSON responses for responsive UI updates
+- Input/output guardrails (prompt-injection detection, PII redaction)
 - Structured handover logging for audit and analytics
 
 Agent Flow
@@ -34,6 +35,7 @@ Operational Notes
 - Tool calls are executed via LangGraph ToolNode; tool responses re-enter the same agent for completion.
 - Handovers between agents are logged for audit and analytics.
 - Responses stream back as NDJSON events so clients can render partial output.
+- Guardrails are enforced at the API boundary (prompt-injection detection) and on streamed responses (PII redaction).
 
 Architecture Overview
 ---------------------

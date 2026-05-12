@@ -7,6 +7,7 @@ import uuid
 from langgraph.checkpoint.memory import MemorySaver
 from retrieval.chroma_collections import get_collection
 from fastapi.responses import StreamingResponse
+from guardrails.input_guardrails import validate_user_input
 
 router = APIRouter()
 
@@ -28,6 +29,18 @@ def call_agent(request: AgentRequest):
     """
     logger = logging.getLogger(__name__)
     try:
+        is_valid, reason = validate_user_input(request.message)
+        if not is_valid:
+            def _guardrail_response():
+                yield (
+                    '{"type": "error", "content": "' + reason + '"}\n'
+                ).encode("utf-8")
+
+            return StreamingResponse(
+                _guardrail_response(),
+                media_type="application/x-ndjson",
+                status_code=400,
+            )
         if not request.thread_id:
             thread_id = str(uuid.uuid4())
         else:

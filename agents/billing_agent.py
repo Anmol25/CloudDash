@@ -1,22 +1,23 @@
 import logging
-import yaml
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from config.schema import AgentState
 from langchain_core.messages import SystemMessage
 from langchain_core.runnables import RunnableConfig
-from retrieval.retriever import knowledge_base_retriever
 from config.schema import AgentOutput
+from config.agent_tools import build_tool_registry, get_agent_tools, load_agents_config
 
 logger = logging.getLogger(__name__)
 
-with open("./config/agents.yaml", "r") as f:
-    agents_config = yaml.safe_load(f)
+agents_config = load_agents_config()
 
 billingAgent_config = agents_config["billing_agent"]
 prompt_location = "./config/" + billingAgent_config["system_prompt"]
 with open(prompt_location, "r") as f:
     SYSTEM_PROMPT = f.read()
+_tool_registry = build_tool_registry(agents_config)
+_billing_tools = get_agent_tools(
+    "billing_agent", agents_config, _tool_registry)
 
 
 def billingAgent(state: AgentState, config: RunnableConfig) -> AgentState:
@@ -35,13 +36,14 @@ def billingAgent(state: AgentState, config: RunnableConfig) -> AgentState:
     try:
         model = ChatGoogleGenerativeAI(
             model=billingAgent_config["model"], temperature=billingAgent_config["temperature"])
-        model_with_tool = model.bind_tools([knowledge_base_retriever])
+        model_with_tool = model.bind_tools(
+            _billing_tools) if _billing_tools else model
 
         response = model_with_tool.invoke(
             [SystemMessage(content=SYSTEM_PROMPT),
              *state["messages"], SystemMessage(content=f"Your task:\n\n task: {current_task['task']}\n\nsummary: {current_task['summary']}\n\nentities: {', '.join(current_task['entities'])}")]
         )
-        if response.tool_calls:
+        if getattr(response, "tool_calls", None):
             return {
                 "messages": [response]
             }

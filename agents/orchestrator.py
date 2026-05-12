@@ -1,7 +1,5 @@
 import json
 import importlib
-from pathlib import Path
-import yaml
 
 from logger.handover_logger import log_handover
 
@@ -9,13 +7,11 @@ from langgraph.graph import StateGraph, START, END
 from config.schema import AgentState
 from .dispatcher import dispatcher, dispatcher_node, dispatch_map
 from langgraph.prebuilt import ToolNode, tools_condition
-from retrieval.retriever import knowledge_base_retriever
+from config.agent_tools import build_tool_registry, load_agents_config, resolve_tool_spec
 from langchain_core.messages import HumanMessage
 from langchain_core.load import dumps
 
-_CONFIG_PATH = Path(__file__).resolve().parents[1] / "config" / "agents.yaml"
-with open(_CONFIG_PATH, "r") as f:
-    _agents_config = yaml.safe_load(f) or {}
+_agents_config = load_agents_config()
 
 
 class AgentOrchestrator:
@@ -24,11 +20,8 @@ class AgentOrchestrator:
         self.thread_id = thread_id
         self.checkpointer = checkpointer
         self.graph = StateGraph(AgentState)
-        self.retriever_tool = knowledge_base_retriever
         self.orchestration = self._load_orchestration_config()
-        self.tool_registry = {
-            "knowledge_base_retriever": self.retriever_tool,
-        }
+        self.tool_registry = build_tool_registry(_agents_config)
         self.agent_nodes = set(self.orchestration["nodes"].keys())
         self.output_nodes = set(
             self.orchestration.get("output_nodes", ["finalizer", "humanAgent"])
@@ -66,15 +59,9 @@ class AgentOrchestrator:
             if tools:
                 tool_instances = []
                 for tool_spec in tools:
-                    if isinstance(tool_spec, dict):
-                        tool = self._import_handler(
-                            tool_spec["module"], tool_spec["handler"]
-                        )
-                    else:
-                        tool = self.tool_registry.get(tool_spec)
-                    if not tool:
-                        raise ValueError(f"Unknown tool: {tool_spec}")
-                    tool_instances.append(tool)
+                    tool_instances.append(
+                        resolve_tool_spec(tool_spec, self.tool_registry)
+                    )
 
                 tool_node_name = f"{node_name}Tools"
                 self.graph.add_node(tool_node_name, ToolNode(tool_instances))
@@ -135,5 +122,4 @@ class AgentOrchestrator:
             if chunk["type"] == "messages":
                 msg, metadata = chunk["data"]
                 if msg.content and (metadata["langgraph_node"] in self.output_nodes):
-                    print(msg.content)
                     yield json.dumps({"type": "message", "content": msg.content}).encode('utf-8') + b'\n'

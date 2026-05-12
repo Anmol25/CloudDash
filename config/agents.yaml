@@ -5,6 +5,12 @@ embeddings:
   dimension: 768
   task-type: RETRIEVAL_DOCUMENT
 
+# Tool registry (shared tool definitions)
+tools:
+  knowledge_base_retriever:
+    module: retrieval.retriever
+    handler: knowledge_base_retriever
+
 # List of agents
 triage_agent:
   model: gemini-2.5-flash

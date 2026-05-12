@@ -35,11 +35,29 @@ Operational Notes
 - Handovers between agents are logged for audit and analytics.
 - Responses stream back as NDJSON events so clients can render partial output.
 
+Architecture Overview
+---------------------
+- The FastAPI endpoint initializes a thread ID, then runs a LangGraph workflow per request.
+- The workflow graph is assembled at runtime from config/agents.yaml, including tools and routing.
+- Triage produces structured tasks; the dispatcher routes each pending task by intent with a fallback.
+- Billing and technical agents can call the knowledge base retriever; tool outputs re-enter the same agent.
+- Escalation flows through the escalation agent to a human-style response when needed.
+- The finalizer aggregates specialist outputs when a human handoff is not required.
+- Handover events are logged with a state snapshot for audit and analytics.
+
 Configuration
 -------------
 - Agent models, prompts, tools, and routing are defined in config/agents.yaml.
 - System prompts live in config/prompts/.
 - Agent state schema is defined in config/schema.py.
+
+Design Decisions
+----------------
+- Configuration-driven orchestration so agents, prompts, tools, and routing can change without code edits.
+- Structured outputs for triage and escalation to keep state deterministic.
+- A tool registry and ToolNode usage to keep tools decoupled from agent logic.
+- Streaming NDJSON responses to improve client responsiveness.
+- Handover logging to capture transitions and context snapshots.
 
 Project Structure
 -----------------
@@ -57,6 +75,13 @@ CloudDash/
 ├── retrieval/
 └── tests/
 ```
+
+Setup Instructions
+------------------
+1. Create and activate a virtual environment.
+2. Install dependencies (see Installation below).
+3. Set environment variables (see Environment Variables below).
+4. Run the API (see Running the API below).
 
 Installation
 ------------
@@ -116,6 +141,14 @@ Notes
 -----
 - The knowledge base is loaded from knowledge_base/knowledge_base.json at startup.
 - Each request reuses the configured Chroma collection and embeds documents with Gemini embeddings.
+
+Known Limitations
+-----------------
+- Chroma uses an in-memory client by default; persistence is not configured.
+- The embedding task type from config is not applied due to a key mismatch.
+- Conversation memory uses in-process checkpointing and does not survive restarts.
+- The API endpoint has no authentication or rate limiting.
+- Knowledge base retrieval returns a fixed top-3 results with no reranking or pagination.
 
 Testing
 -------

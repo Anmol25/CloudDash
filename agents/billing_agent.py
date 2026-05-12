@@ -5,7 +5,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from config.schema import AgentState
 from langchain_core.messages import SystemMessage
 from langchain_core.runnables import RunnableConfig
-from retrieval.retriever import get_retriever_tool
+from retrieval.retriever import knowledge_base_retriever
 from config.schema import AgentOutput
 
 logger = logging.getLogger(__name__)
@@ -25,8 +25,6 @@ def billingAgent(state: AgentState, config: RunnableConfig) -> AgentState:
     In case of failure, it marks the task as failed and provides a fallback response for escalation to a human operator.
     """
     tasks = state["tasks"]
-    collection = config["configurable"]["collection"]
-    retriever_tool = get_retriever_tool(collection)
 
     current_task = next(
         t for t in tasks
@@ -37,7 +35,7 @@ def billingAgent(state: AgentState, config: RunnableConfig) -> AgentState:
     try:
         model = ChatGoogleGenerativeAI(
             model=billingAgent_config["model"], temperature=billingAgent_config["temperature"])
-        model_with_tool = model.bind_tools([retriever_tool])
+        model_with_tool = model.bind_tools([knowledge_base_retriever])
 
         response = model_with_tool.invoke(
             [SystemMessage(content=SYSTEM_PROMPT),

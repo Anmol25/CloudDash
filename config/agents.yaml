@@ -16,14 +16,14 @@ technical_agent:
   temperature: 0
   system_prompt: prompts/technical_agent.md
   tools:
-    - retrieval_tool
+    - knowledge_base_retriever
   
 billing_agent:
   model: gemini-2.5-flash
   temperature: 0
   system_prompt: prompts/billing_agent.md
   tools:
-    - retrieval_tool
+    - knowledge_base_retriever
   
 escalation_agent:
   model: gemini-2.5-flash
@@ -59,12 +59,12 @@ orchestration:
       module: agents.billing_agent
       handler: billingAgent
       tools:
-        - retrieval_tool
+        - knowledge_base_retriever
     technicalAgent:
       module: agents.technical_agent
       handler: technicalAgent
       tools:
-        - retrieval_tool
+        - knowledge_base_retriever
     escalationAgent:
       module: agents.escalation_agent
       handler: escalationAgent

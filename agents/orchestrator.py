@@ -9,7 +9,7 @@ from langgraph.graph import StateGraph, START, END
 from config.schema import AgentState
 from .dispatcher import dispatcher, dispatcher_node, dispatch_map
 from langgraph.prebuilt import ToolNode, tools_condition
-from retrieval.retriever import get_retriever_tool
+from retrieval.retriever import knowledge_base_retriever
 from langchain_core.messages import HumanMessage
 from langchain_core.load import dumps
 
@@ -24,10 +24,10 @@ class AgentOrchestrator:
         self.thread_id = thread_id
         self.checkpointer = checkpointer
         self.graph = StateGraph(AgentState)
-        self.retriever_tool = get_retriever_tool(collection)
+        self.retriever_tool = knowledge_base_retriever
         self.orchestration = self._load_orchestration_config()
         self.tool_registry = {
-            "retrieval_tool": self.retriever_tool,
+            "knowledge_base_retriever": self.retriever_tool,
         }
         self.agent_nodes = set(self.orchestration["nodes"].keys())
         self.output_nodes = set(

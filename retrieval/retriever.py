@@ -3,6 +3,7 @@ from langchain_core.retrievers import BaseRetriever
 from typing import List
 from langchain_core.documents import Document
 from langchain_core.tools import tool
+from langchain_core.runnables import RunnableConfig
 
 
 class CustomChromaRetriever(BaseRetriever):
@@ -44,26 +45,29 @@ class CustomChromaRetriever(BaseRetriever):
             return []
 
 
-def get_retriever_tool(collection):
+@tool
+def knowledge_base_retriever(query: str, config: RunnableConfig) -> str:
+    """
+    Retrieve articles from knowledge base.
+    """
+    logger = logging.getLogger(__name__)
+    collection = config["configurable"]["collection"]
     retriever = CustomChromaRetriever(
         collection=collection,
         k=3
     )
 
-    @tool
-    def knowledge_base_retriever(query: str) -> str:
-        """
-        Retrieve articles from knowledge base.
-        """
-        logger = logging.getLogger(__name__)
-        try:
-            docs = retriever.invoke(query)
+    try:
+        docs = retriever.invoke(query)
 
-            formatted = []
+        if not docs:
+            return "No knowledge base results found for your query."
 
-            for doc in docs:
-                formatted.append(
-                    f"""
+        formatted = []
+
+        for doc in docs:
+            formatted.append(
+                f"""
 ID: {doc.metadata.get("id")}
 TITLE: {doc.metadata.get("title")}
 CATEGORY: {doc.metadata.get("category")}
@@ -73,11 +77,9 @@ TAGS: {doc.metadata.get("tags")}
 CONTENT:
 {doc.page_content}
 """
-                )
+            )
 
-            return "\n\n====================\n\n".join(formatted)
-        except Exception:
-            logger.exception("Knowledge base retrieval failed")
-            return "Knowledge base retrieval failed. Please try again later."
-
-    return knowledge_base_retriever
+        return "\n\n====================\n\n".join(formatted)
+    except Exception:
+        logger.exception("Knowledge base retrieval failed")
+        return "Knowledge base retrieval failed. Please try again later."

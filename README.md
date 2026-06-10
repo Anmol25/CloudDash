@@ -16,19 +16,6 @@ Key Features
 - Input/output guardrails (prompt-injection detection, PII redaction)
 - Structured handover logging for audit and analytics
 
-Instructions to run Live app
-------------
-1. Open the backend API:
-   https://clouddash-1.onrender.com/
-
-   - Wait for the server to wake up.
-   - This usually takes around 1 minute if the service is idle.
-
-2. After the API is active, open the chatbot UI:
-   https://clouddashui.streamlit.app/
-
-3. You can now use the chatbot interface.
-
 Agent Flow
 ----------
 ![Architecture](images/Architecture.png)
